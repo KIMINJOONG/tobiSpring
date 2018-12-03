@@ -12,9 +12,13 @@ import com.mysql.cj.x.protobuf.MysqlxConnection.CapabilitiesSet;
 import springbook.user.domain.User;
 
 public class UserDao {
+	private SimpleConnectionMaker simpleConnectionMaker;
+	
+	public UserDao() {
+		simpleConnectionMaker = new SimpleConnectionMaker();
+	}
 	public void add(User user) throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.jdbc.Driver");
-		Connection c = DriverManager.getConnection("jdbc:mysql:localhost/tobiSpring", "spring", "book");
+		Connection c = simpleConnectionMaker.makeNewConnection();
 		PreparedStatement ps = c.prepareStatement(
 				"insert into users(id, name, password) values(?, ?, ?)");
 		ps.setString(1, user.getId());
@@ -28,9 +32,7 @@ public class UserDao {
 	}
 	
 	public User get(String id) throws ClassNotFoundException, SQLException {
-		Class.forName("com.mysql.cj.Driver");
-		Connection c = DriverManager.getConnection("cj:mysql://localhost/tobiSpring", "spring", "book");
-		
+		Connection c = simpleConnectionMaker.makeNewConnection();
 		PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
 		ps.setString(1, id);
 		
@@ -50,6 +52,7 @@ public class UserDao {
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 		UserDao dao = new UserDao();
 		User user = new User();
+		user.setId("whiteship");
 		user.setName("¹é±â¼±");
 		user.setPassword("married");
 		
