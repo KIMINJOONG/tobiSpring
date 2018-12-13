@@ -65,7 +65,8 @@ public class UserDao {
 		
 		try {
 			c = dataSource.getConnection();
-			ps = c.prepareStatement("delete from users");
+			StatementStrategy strategy = new DeleteAllStatement();
+			ps = strategy.makePreparedStatement(c);
 			ps.executeUpdate();
 		} catch (SQLException e) {
 			// TODO: handle exception
@@ -90,6 +91,12 @@ public class UserDao {
 		
 		ps.close();
 		c.close();
+	}
+	
+	private PreparedStatement makeStatement(Connection c) throws SQLException {
+		PreparedStatement ps;
+		ps = c.prepareStatement("delete from users");
+		return ps;
 	}
 	
 	public int getCount() throws SQLException {
