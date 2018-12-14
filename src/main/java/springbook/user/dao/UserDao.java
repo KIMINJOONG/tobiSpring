@@ -1,18 +1,12 @@
 package springbook.user.dao;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.activation.DataSource;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-
-import com.mysql.cj.protocol.Resultset;
-import com.mysql.cj.x.protobuf.MysqlxConnection.CapabilitiesSet;
-
 import springbook.user.domain.User;
 
 public class UserDao {
@@ -60,43 +54,30 @@ public class UserDao {
 	}
 	
 	public void deleteAll() throws SQLException {
-		Connection c = null;
-		PreparedStatement ps =null;
-		
-		try {
-			c = dataSource.getConnection();
-			StatementStrategy strategy = new DeleteAllStatement();
-			ps = strategy.makePreparedStatement(c);
-			ps.executeUpdate();
-		} catch (SQLException e) {
-			// TODO: handle exception
-			throw e;
-		} finally {
-			if(ps!= null) {
-				try {
-					ps.close();
-				} catch (SQLException e) {
-					// TODO: handle exception
-				}
-			}
-			if(c != null) {
-				try  {
-					c.close();
-				} catch (SQLException e) {
-					// TODO: handle exception
-				}
-			}
-		}
-		
-		
-		ps.close();
-		c.close();
+		StatementStrategy st = new DeleteAllStatement();
+		jdbcContextWithStatementStrategy(st);
 	}
 	
 	private PreparedStatement makeStatement(Connection c) throws SQLException {
 		PreparedStatement ps;
 		ps = c.prepareStatement("delete from users");
 		return ps;
+	}
+	
+	public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException {
+		Connection c = null;
+		PreparedStatement ps = null;
+		
+		try {
+			c = dataSource.getConnection();
+			ps = stmt.makePreparedStatement(c);
+			ps.executeUpdate();
+		} catch(SQLException e) {
+			throw e;
+		} finally {
+			if(ps != null) { try {ps.close();} catch(SQLException e) {} }
+			if(c != null) {try{c.close();} catch(SQLException e) {} }
+		}
 	}
 	
 	public int getCount() throws SQLException {
@@ -107,6 +88,7 @@ public class UserDao {
 			c = dataSource.getConnection();
 			ps = c.prepareStatement("select count(*) from users");
 			rs = ps.executeQuery();
+			rs.next();
 			return rs.getInt(1);
 			
 		} catch(SQLException e) {
