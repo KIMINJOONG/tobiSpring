@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?><testrun name="CalcSumTest" project="TobiSpringStudy" tests="1" started="1" failures="0" errors="0" ignored="0">
-  <testsuite name="springbook.learningtest.template.CalcSumTest" time="0.006">
-    <testcase name="sumOfNumbers" classname="springbook.learningtest.template.CalcSumTest" time="0.006"/>
-  </testsuite>
-</testrun>
