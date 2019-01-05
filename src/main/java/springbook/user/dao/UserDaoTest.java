@@ -168,6 +168,7 @@ public class UserDaoTest {
 		checkSameUser(user1, user1update);
 		User user2same = dao.get(user2.getId());
 		checkSameUser(user2, user2same);
+		//¾È³ç
 	}
 	
 }
