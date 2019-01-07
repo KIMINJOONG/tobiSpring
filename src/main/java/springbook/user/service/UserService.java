@@ -26,6 +26,7 @@ public class UserService {
 				user.setLevel(Level.SILVER);
 				changed = true;
 			} else if(user.getLevel() == Level.SILVER && user.getRecommend() >= 30) {
+				user.setLevel(Level.GOLD);
 				changed = true;
 			} else if(user.getLevel() == Level.GOLD) { changed = false; }
 			else { changed = false; }
