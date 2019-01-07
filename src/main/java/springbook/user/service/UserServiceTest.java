@@ -55,8 +55,24 @@ public class UserServiceTest {
 	
 	private void checkLevel(User user, Level expectedLevel) {
 		User userUpdate = userDao.get(user.getId());
-		System.out.println(expectedLevel);
 		assertThat(userUpdate.getLevel(), is(expectedLevel));
 	}
 	
+	@Test
+	public void add() {
+		userDao.deleteAll();
+		
+		User userWithLevel = users.get(4); //GOLD 레벨
+		User userWithoutLevel = users.get(0); // 레벨이 비어있는 사용자, 로직에 따라 등록중에 BASIC레벨로 설정
+		userWithoutLevel.setLevel(null);
+		
+		userService.add(userWithLevel);
+		userService.add(userWithoutLevel);
+		
+		User userWithLevelRead = userDao.get(userWithLevel.getId());
+		User userWithoutLevelRead = userDao.get(userWithoutLevel.getId());
+		
+		assertThat(userWithLevelRead.getLevel(), is(userWithLevel.getLevel()));
+		assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+	}
 }
