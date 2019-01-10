@@ -40,14 +40,27 @@ public class UserService {
 		}
 	}
 	
-	private void upgradeLevel(User user) {
+	static class TestUserService extends UserService {
+		private String id;
+		
+		TestUserService(String id) {
+			this.id = id;
+		}
+		
+		protected void upgradeLevel(User user) {
+			if(user.getId().equals(this.id)) throw new TestUserServiceException();
+			super.upgradeLevel(user);
+		}
+	}
+	
+	protected void upgradeLevel(User user) {
 		user.upgradeLevel();
 		userDao.update(user);
 	}
-	
 	public void add(User user) {
 		if(user.getLevel() == null) user.setLevel(Level.BASIC);
 		userDao.add(user);
 	}
 	
 }
+

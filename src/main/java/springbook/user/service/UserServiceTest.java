@@ -4,9 +4,10 @@ import static org.hamcrest.CoreMatchers.is;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
-
+import static org.junit.Assert.fail;
 import static springbook.user.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
 import static springbook.user.service.UserService.MIN_RECCOMEND_FOR_GOLD;
+import static springbook.user.service.UserService.TestUserService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,6 +41,23 @@ public class UserServiceTest {
 				, new User("madnite1", "이상호", "p4", Level.SILVER, 60, MIN_RECCOMEND_FOR_GOLD)
 				, new User("green", "오민규", "p5", Level.GOLD, 100, Integer.MAX_VALUE)
 		);
+	}
+	
+	@Test
+	public void upgradeAllOrNothing() {
+		UserService testUserService = new TestUserService(users.get(3).getId());
+		testUserService.setUserDao(this.userDao);
+		userDao.deleteAll();
+		for(User user : users) userDao.add(user);
+		
+		try {
+			testUserService.upgradeLevels();
+			fail("TestUserServiceException expected");
+		} catch(TestUserServiceException e) {
+			
+		}
+		
+		checkLevelUpgraded(users.get(1), false);
 	}
 	
 	@Test
