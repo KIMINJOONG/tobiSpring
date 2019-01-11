@@ -2,30 +2,55 @@ package springbook.user.service;
 
 import static org.junit.Assert.assertThat;
 
+import java.sql.Connection;
 import java.util.List;
 
+import javax.sql.DataSource;
+import static springbook.user.service.UserServiceTest.TestUserServiceException;
+
 import org.junit.Test;
+import org.springframework.jdbc.datasource.DataSourceUtils;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import springbook.user.dao.UserDao;
 import springbook.user.domain.Level;
 import springbook.user.domain.User;
 
 public class UserService {
+	private DataSource dataSource;
 	UserDao userDao;
-	UserLevelUpgradePolicy userLevelUpgradePolicy = new NUserLevelUpgradePolicy();
+//	UserLevelUpgradePolicy userLevelUpgradePolicy = new NUserLevelUpgradePolicy();
 
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;
 	}
 	
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+
 	@Test
-	public void upgradeLevels() {
-		List<User> users = userDao.getAll();
-		for(User user : users) {
-			if(userLevelUpgradePolicy.canUpgradeLevel(user)) {
-				userLevelUpgradePolicy.upgradeLevel(user, userDao);
+	public void upgradeLevels() throws Exception {
+		TransactionSynchronizationManager.initSynchronization();
+		Connection c = DataSourceUtils.getConnection(dataSource);
+		c.setAutoCommit(false);
+		try {
+			List<User> users = userDao.getAll();
+			for(User user : users) {
+				if(canUpgradeLevel(user)) {
+					upgradeLevel(user);
+				}
 			}
+			c.commit();
+		} catch(Exception e) {
+			c.rollback();
+			throw e;
+		} finally {
+			DataSourceUtils.releaseConnection(c, dataSource);
+			TransactionSynchronizationManager.unbindResource(this.dataSource);
+			TransactionSynchronizationManager.clearSynchronization();
 		}
+		
 	}
 	
 	public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
@@ -40,18 +65,6 @@ public class UserService {
 		}
 	}
 	
-	static class TestUserService extends UserService {
-		private String id;
-		
-		TestUserService(String id) {
-			this.id = id;
-		}
-		
-		protected void upgradeLevel(User user) {
-			if(user.getId().equals(this.id)) throw new TestUserServiceException();
-			super.upgradeLevel(user);
-		}
-	}
 	
 	protected void upgradeLevel(User user) {
 		user.upgradeLevel();
