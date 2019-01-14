@@ -41,15 +41,15 @@ public class UserDaoTest {
 	public void setUp() {
 		DataSource dataSource = new SingleConnectionDataSource(
 				"jdbc:mysql://localhost/testdb?serverTimezone=UTC", "spring", "book", true);
-		this.user1 = new User("gyumee", "박성철", "springno1",Level.BASIC, 1, 0);
-		this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10);
-		this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40);
+		this.user1 = new User("gyumee", "박성철", "springno1",Level.BASIC, 1, 0, "naver.com");
+		this.user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10, "google.com");
+		this.user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40, "nate.com");
 	}
 	
 	@Test
 	public void addAndGet() throws SQLException, ClassNotFoundException {
-		User user1 = new User("gyumee", "박성철", "springno1",Level.BASIC, 1, 0);
-		User user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10);
+		User user1 = new User("gyumee", "박성철", "springno1",Level.BASIC, 1, 0, "naver.com");
+		User user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10, "gmail.com");
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
 		
@@ -68,9 +68,9 @@ public class UserDaoTest {
 	
 	@Test
 	public void count() throws SQLException, ClassNotFoundException {
-		User user1 = new User("gyumee", "박성철", "springno1",Level.BASIC, 1, 0);
-		User user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10);
-		User user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40);
+		User user1 = new User("gyumee", "박성철", "springno1",Level.BASIC, 1, 0, "naver.com");
+		User user2 = new User("leegw700", "이길원", "springno2", Level.SILVER, 55, 10, "nate.com");
+		User user3 = new User("bumjin", "박범진", "springno3", Level.GOLD, 100, 40, "gmail.com");
 		
 		dao.deleteAll();
 		assertThat(dao.getCount(), is(0));
