@@ -17,6 +17,9 @@ import javax.mail.internet.MimeMessage;
 import javax.management.RuntimeErrorException;
 
 import org.junit.Test;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
@@ -79,36 +82,15 @@ public class UserService {
 	}
 	
 	private void sendUpgradeEmail(User user) {
-		final String userId = "이메일";
-		final String password = "비밀번호";
-		Properties props = System.getProperties();
-		props.put("mail.smtp.host", "smtp.naver.com");
-        props.put("mail.smtp.port", 465);
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.ssl.enable", "true");
-        props.put("mail.smtp.ssl.trust", "smtp.naver.com");
+		JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+		mailSender.setHost("smtp.naver.com");
+		SimpleMailMessage mailMessage = new SimpleMailMessage();
+		mailMessage.setTo(user.getEmail());
+		mailMessage.setFrom("dlswnd4452@naver.com");
+		mailMessage.setSubject("Upgrade 안내");
+		mailMessage.setText("사용자님의 등급이" + user.getLevel().name());
 		
-		Session s = Session.getDefaultInstance(props, new Authenticator() {
-			protected javax.mail.PasswordAuthentication getPasswordAuthentication() { 
-				return new javax.mail.PasswordAuthentication(userId, password); }
-
-			
-		});
-		
-		MimeMessage message = new MimeMessage(s);
-		try {
-			message.setFrom(new InternetAddress("dlswnd4452@naver.com"));
-			System.out.println(user.getEmail());
-			message.addRecipient(Message.RecipientType.TO, new InternetAddress(user.getEmail()));
-			message.setSubject("Upgrade 안내");
-			message.setText("사용자님의 등급이" + user.getLevel().name() + "로 업그레이드 되었습니다.");
-			
-			Transport.send(message);
-		} catch(AddressException e) {
-			throw new RuntimeException(e);
-		} catch(MessagingException e) {
-			throw new RuntimeException(e);
-		}
+		mailSender.send(mailMessage);
 	}
 	
 	public void add(User user) {
