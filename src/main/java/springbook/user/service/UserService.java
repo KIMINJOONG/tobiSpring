@@ -17,6 +17,7 @@ import javax.mail.internet.MimeMessage;
 import javax.management.RuntimeErrorException;
 
 import org.junit.Test;
+import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -33,6 +34,11 @@ public class UserService {
 	UserDao userDao;
 //	UserLevelUpgradePolicy userLevelUpgradePolicy = new NUserLevelUpgradePolicy();
 	private PlatformTransactionManager transactionManager;
+	private MailSender mailSender;
+	
+	public void setMailSender(MailSender mailSender) {
+		this.mailSender = mailSender;
+	}
 
 	public void setUserDao(UserDao userDao) {
 		this.userDao = userDao;
@@ -90,7 +96,7 @@ public class UserService {
 		mailMessage.setSubject("Upgrade 안내");
 		mailMessage.setText("사용자님의 등급이" + user.getLevel().name());
 		
-		mailSender.send(mailMessage);
+		this.mailSender.send(mailMessage);
 	}
 	
 	public void add(User user) {
