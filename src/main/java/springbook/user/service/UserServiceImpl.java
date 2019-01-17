@@ -51,16 +51,13 @@ public class UserServiceImpl implements UserService {
 
 
 	@Test
-	public void upgradeLevels() {
-		TransactionStatus status = this.transactionManager.getTransaction(new DefaultTransactionDefinition());
-		try {
-			upgradeLevelsInternal();
-			this.transactionManager.commit(status);
-		} catch(Exception e) {
-			this.transactionManager.rollback(status);
-			throw e;
-		} 
-		
+	public void upgradeLevels(){
+		List<User> users = userDao.getAll();
+		for(User user : users) {
+			if(canUpgradeLevel(user)) {
+				upgradeLevel(user);
+			}
+		}
 	}
 	
 	private void upgradeLevelsInternal() {

@@ -31,13 +31,17 @@ import springbook.user.domain.User;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations="/test-applicationContext.xml")
-public class UserServiceImplTest {
+public class UserServiceTest {
+	@Autowired
+	UserService userService;
+	
 	@Autowired
 	MailSender mailSender;
 	@Autowired
 	PlatformTransactionManager transactionManager;
+	
 	@Autowired
-	UserServiceImpl userService;
+	UserServiceImpl userServiceImpl;
 	@Autowired
 	UserDao userDao;
 	
@@ -78,11 +82,16 @@ public class UserServiceImplTest {
 		testUserService.setUserDao(userDao);
 		testUserService.setTransactionManager(transactionManager);
 		testUserService.setMailSender(mailSender);
+		
+		UserServiceTx txUserService = new UserServiceTx();
+		txUserService.setTransactionManager(transactionManager);
+		txUserService.setUserService(testUserService);
+		
 		userDao.deleteAll();
 		for(User user : users) userDao.add(user);
 		
 		try {
-			testUserService.upgradeLevels();
+			txUserService.upgradeLevels();
 			fail("TestUserServiceException expected");
 		} catch(TestUserServiceException e) {
 			
@@ -115,7 +124,7 @@ public class UserServiceImplTest {
 		for(User user : users) userDao.add(user);
 		
 		MockMailSender mockMailSender = new MockMailSender();
-		userService.setMailSender(mockMailSender);
+		userServiceImpl.setMailSender(mockMailSender);
 		userService.upgradeLevels();
 		checkLevelUpgraded(users.get(0), false);
 		checkLevelUpgraded(users.get(1), true);
