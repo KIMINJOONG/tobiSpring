@@ -149,7 +149,7 @@ public class UserServiceTest {
 
 		@Override
 		public List<User> getAll() {
-			throw new UnsupportedOperationException();
+			return this.users;
 		}
 
 		@Override
