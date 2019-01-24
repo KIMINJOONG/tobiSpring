@@ -21,4 +21,5 @@ public class HelloTest {
 		assertThat(proxiedHello.sayHi("Toby"), is("HI TOBY"));
 		assertThat(proxiedHello.sayThankYou("TOby"), is("THANK YOU TOBY"));
 	}
+	
 }
